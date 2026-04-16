@@ -1,0 +1,21 @@
+{
+  "name": "codex-sqlite-memory-mcp",
+  "version": "0.1.0",
+  "private": false,
+  "type": "module",
+  "description": "A zero-install Codex MCP memory server backed by SQLite.",
+  "scripts": {
+    "start": "node src/main.mjs",
+    "verify": "node tests/verify.mjs"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "keywords": [
+    "codex",
+    "mcp",
+    "sqlite",
+    "memory"
+  ],
+  "license": "MIT"
+}
