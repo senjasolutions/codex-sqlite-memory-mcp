@@ -130,6 +130,9 @@ If WAL files exist, back them up with the main DB file.
 ## Benchmark takeaway
 
 On a repeated task benchmark from the original setup environment:
+- file path: about 2,875 tokens
+- memory path: about 210 tokens
+- reduction: about 2,665 tokens or around 92%
 
 - direct file retrieval was slightly faster
 - memory retrieval reduced payload from about `11,501` bytes to about `839` bytes
