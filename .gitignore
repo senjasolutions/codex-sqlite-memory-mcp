@@ -1,0 +1,6 @@
+data/codex-memory.sqlite
+data/codex-memory.sqlite-shm
+data/codex-memory.sqlite-wal
+tmp/codex-memory-verify.sqlite
+tmp/codex-memory-verify.sqlite-shm
+tmp/codex-memory-verify.sqlite-wal
