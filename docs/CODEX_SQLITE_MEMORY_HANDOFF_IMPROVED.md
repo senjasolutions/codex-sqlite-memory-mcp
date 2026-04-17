@@ -24,15 +24,19 @@ The original direction was sound, but real setup work exposed several practical 
    - Defaulting the DB into a tracked repo path is usually the wrong default.
    - Keep code in Git, keep state ignored by Git.
 
-4. Zero-install Node is viable if local Node exposes `node:sqlite`.
-   - This removes package installation friction.
-   - It also means the first version carries Node's current experimental warning for `node:sqlite`.
+4. Protocol handling should use the official MCP SDK.
+   - Hand-rolled stdio/JSON-RPC framing is the main long-term compatibility risk.
+   - Keep custom logic focused on the memory domain, not transport mechanics.
 
-5. Search must stay permissive.
+5. Zero-install Node is viable for SQLite persistence if local Node exposes `node:sqlite`.
+   - This keeps the storage layer light.
+   - It also means the implementation still carries Node's current experimental warning for `node:sqlite`.
+
+6. Search must stay permissive.
    - An overconstrained FTS query builder can make correct records disappear.
    - Natural-language memory search should degrade gracefully, not require perfect query phrasing.
 
-6. The main payoff is **token reduction**, not necessarily raw local speed.
+7. The main payoff is **token reduction**, not necessarily raw local speed.
    - For tiny local files, direct file reads can still be faster.
    - The larger win is returning one compact durable record instead of shoving full docs into model context.
 
@@ -241,4 +245,3 @@ When done, provide:
    - whether token usage improved
    - whether raw local speed improved or not
    - whether accuracy matched the source-of-truth path
-

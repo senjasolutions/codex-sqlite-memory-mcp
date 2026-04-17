@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": false,
   "type": "module",
-  "description": "A zero-install Codex MCP memory server backed by SQLite.",
+  "description": "A Codex MCP memory server backed by SQLite.",
   "scripts": {
     "start": "node src/main.mjs",
     "verify": "node tests/verify.mjs"
@@ -17,6 +17,9 @@
     "sqlite",
     "memory"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.3.6"
+  }
 }
-
