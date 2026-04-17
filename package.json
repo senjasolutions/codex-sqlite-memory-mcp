@@ -1,12 +1,14 @@
 {
   "name": "codex-sqlite-memory-mcp",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": false,
   "type": "module",
   "description": "A Codex MCP memory server backed by SQLite.",
   "scripts": {
+    "codex:config": "node scripts/install-codex-config.mjs",
     "start": "node src/main.mjs",
-    "verify": "node tests/verify.mjs"
+    "verify": "node tests/verify.mjs",
+    "verify:paths": "node tests/paths-verify.mjs"
   },
   "engines": {
     "node": ">=24.0.0"

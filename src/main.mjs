@@ -1,16 +1,15 @@
-import path from "node:path";
 import process from "node:process";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { ErrorCode, McpError } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
+import { resolveDbPath } from "./lib/paths.mjs";
 import { MemoryStore, formatMemorySummary } from "./lib/store.mjs";
 
-const dbPath = path.resolve(
-  process.cwd(),
-  process.env.MEMORY_DB_PATH || "data/codex-memory.sqlite"
-);
+const dbPath = resolveDbPath(process.env);
 
 const store = new MemoryStore({ dbPath });
+const debugEnabled = process.env.MEMORY_DEBUG === "1";
 
 const scopeSchema = z.enum(["global", "project", "repo", "task"]);
 const kindSchema = z.enum([
@@ -27,6 +26,26 @@ const server = new McpServer({
   name: "codex-sqlite-memory-mcp",
   version: "0.1.0",
 });
+
+server.server.onerror = (error) => {
+  debugLog("protocol-error", error instanceof Error ? error.message : String(error));
+};
+
+server.server.onclose = () => {
+  debugLog("transport-close");
+};
+
+server.server.fallbackRequestHandler = async (request) => {
+  debugLog("unsupported-request", request.method);
+  throw new McpError(
+    ErrorCode.MethodNotFound,
+    `Unsupported method: ${request.method}`
+  );
+};
+
+server.server.fallbackNotificationHandler = async (notification) => {
+  debugLog("ignored-notification", notification.method);
+};
 
 server.registerTool(
   "save_memory",
@@ -139,7 +158,11 @@ process.on("exit", () => {
 
 async function main() {
   const transport = new StdioServerTransport();
+  transport.onerror = (error) => {
+    debugLog("transport-error", error instanceof Error ? error.message : String(error));
+  };
   await server.connect(transport);
+  debugLog("server-ready", { dbPath });
 }
 
 main().catch((error) => {
@@ -152,4 +175,17 @@ function toolResult(message, data) {
     content: [{ type: "text", text: message }],
     structuredContent: data,
   };
+}
+
+function debugLog(event, details) {
+  if (!debugEnabled) {
+    return;
+  }
+
+  const payload =
+    details === undefined
+      ? { event }
+      : { event, details };
+
+  process.stderr.write(`[memory-debug] ${JSON.stringify(payload)}\n`);
 }
