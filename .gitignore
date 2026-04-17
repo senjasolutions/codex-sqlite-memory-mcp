@@ -1,3 +1,5 @@
+node_modules/
+tmp/
 data/codex-memory.sqlite
 data/codex-memory.sqlite-shm
 data/codex-memory.sqlite-wal

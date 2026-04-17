@@ -7,3 +7,4 @@ enabled = true
 
 [mcp_servers.memory.env]
 MEMORY_DB_PATH = "data/codex-memory.sqlite"
+

@@ -11,7 +11,8 @@ This project gives Codex a small explicit memory layer for durable facts, decisi
 - Codex instructions alone do not create durable searchable memory.
 - SQLite is easy to inspect, back up, and evolve.
 - MCP is the clean integration surface Codex already uses.
-- The first version avoids package installation by using local Node plus `node:sqlite`.
+- The server now uses the official MCP SDK for protocol handling.
+- SQLite persistence still uses local Node plus `node:sqlite`.
 
 ## What this project includes
 
@@ -37,6 +38,13 @@ Requirements:
 
 - Node.js `24+`
 - Codex with project-scoped MCP support
+- installed project dependencies
+
+Install dependencies:
+
+```bash
+npm install
+```
 
 Start the server directly:
 
@@ -121,7 +129,7 @@ If WAL files exist, back them up with the main DB file.
 
 ## Known limitations
 
-- this version uses raw stdio MCP handling rather than the official MCP Node SDK
+- this version uses the official MCP SDK over stdio
 - it relies on `node:sqlite`, which currently emits an experimental warning in Node
 - file reads can still be faster than SQLite lookup for tiny local contexts
 - the bigger win is token reduction and repeated-task recall, not sub-millisecond local IO
@@ -130,9 +138,6 @@ If WAL files exist, back them up with the main DB file.
 ## Benchmark takeaway
 
 On a repeated task benchmark from the original setup environment:
-- file path: about 2,875 tokens
-- memory path: about 210 tokens
-- reduction: about 2,665 tokens or around 92%
 
 - direct file retrieval was slightly faster
 - memory retrieval reduced payload from about `11,501` bytes to about `839` bytes

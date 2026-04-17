@@ -6,3 +6,4 @@
 - Never store secrets, passwords, tokens, or private keys.
 - Keep memory concise, scoped, and factual.
 - Treat source code and checked-in docs as authoritative when memory and source disagree.
+
