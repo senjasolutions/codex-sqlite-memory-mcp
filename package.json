@@ -6,6 +6,8 @@
   "description": "A Codex MCP memory server backed by SQLite.",
   "scripts": {
     "codex:config": "node scripts/install-codex-config.mjs",
+    "verify:protocol": "node tests/protocol-regression.mjs",
+    "verify:storage": "node tests/storage-regression.mjs",
     "start": "node src/main.mjs",
     "verify": "node tests/verify.mjs",
     "verify:paths": "node tests/paths-verify.mjs"

@@ -85,12 +85,43 @@ assert.equal(firstUpsert.action, "inserted");
 assert.equal(secondUpsert.action, "updated");
 assert.equal(firstUpsert.memory.id, secondUpsert.memory.id);
 
+const byKey = store.getMemoryByKey("architecture.memory.backend");
+assert.ok(byKey);
+assert.equal(byKey.memory_key, "architecture.memory.backend");
+
+const listed = store.listMemories({
+  project: "demo",
+  kind: "decision",
+  archived: false,
+  limit: 10,
+});
+assert.ok(listed.some((memory) => memory.memory_key === "architecture.memory.backend"));
+
 const dedupeResults = store.searchMemory({ query: "Canonical persistence", limit: 10 });
 assert.equal(dedupeResults.filter((memory) => memory.memory_key === "architecture.memory.backend").length, 1);
 
 store.archiveMemory(decision.id);
 const archivedResults = store.searchMemory({ query: "zero-install", limit: 10 });
 assert.equal(archivedResults.length, 0);
+
+assert.throws(
+  () => store.deleteMemory({ id: fact.id, confirm: false }),
+  /confirm=true/,
+);
+
+const deleted = store.deleteMemory({
+  memory_key: "architecture.memory.backend",
+  confirm: true,
+});
+assert.ok(deleted);
+assert.equal(deleted.memory_key, "architecture.memory.backend");
+assert.equal(store.getMemoryByKey("architecture.memory.backend", { includeArchived: true }), null);
+assert.equal(
+  store.searchMemory({ query: "Canonical persistence", limit: 10 }).filter(
+    (memory) => memory.memory_key === "architecture.memory.backend",
+  ).length,
+  0,
+);
 
 assert.throws(
   () => store.saveMemory({
@@ -113,9 +144,12 @@ console.log(JSON.stringify({
   verified: [
     "save_memory",
     "search_memory",
+    "list_memories",
     "get_recent_memories",
+    "get_memory_by_key",
     "upsert_memory",
     "archive_memory",
+    "delete_memory",
     "secret_rejection"
   ]
 }, null, 2));

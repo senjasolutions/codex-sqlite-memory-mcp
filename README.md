@@ -30,9 +30,30 @@ This project gives Codex a small explicit memory layer for durable facts, decisi
 
 - `save_memory`
 - `search_memory`
+- `list_memories`
+- `get_memory_by_key`
 - `get_recent_memories`
 - `upsert_memory`
 - `archive_memory`
+- `delete_memory`
+
+Direct lookup by stable key:
+
+```text
+get_memory_by_key(memory_key="architecture.memory.backend")
+```
+
+Admin-style listing with filters:
+
+```text
+list_memories(project="demo", kind="decision", archived=false, limit=10)
+```
+
+Hard delete with explicit confirmation:
+
+```text
+delete_memory(memory_key="architecture.memory.backend", confirm=true)
+```
 
 ## Quick start
 
@@ -80,7 +101,7 @@ node tests/verify.mjs
 
 Continuous integration:
 
-- GitHub Actions runs `npm run verify` and `npm run verify:paths` on every push and pull request.
+- GitHub Actions runs `npm run verify`, `npm run verify:paths`, `npm run verify:protocol`, and `npm run verify:storage` on every push and pull request.
 
 ## Install for Codex users
 
@@ -155,6 +176,11 @@ Do not store:
 - speculative guesses
 - duplicate noise
 - secrets, passwords, tokens, private keys
+
+Archive vs delete:
+
+- `archive_memory` is the safer default and hides a record from normal retrieval without removing it from SQLite
+- `delete_memory` permanently removes a record and requires `confirm=true`
 
 ## Database path
 

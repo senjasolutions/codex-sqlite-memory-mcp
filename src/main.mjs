@@ -94,6 +94,64 @@ server.registerTool(
 );
 
 server.registerTool(
+  "get_memory_by_key",
+  {
+    description: "Retrieve one memory directly by its stable memory_key.",
+    inputSchema: {
+      memory_key: z.string(),
+      include_archived: z.boolean().optional(),
+    },
+  },
+  async (args) => {
+    const memory = store.getMemoryByKey(args.memory_key, {
+      includeArchived: args.include_archived,
+    });
+
+    if (!memory) {
+      return toolResult(`No memory found for key ${args.memory_key}`, {
+        found: false,
+        memory_key: args.memory_key,
+        memory: null,
+      });
+    }
+
+    return toolResult(`Found memory ${memory.id} for key ${args.memory_key}`, {
+      found: true,
+      memory_key: args.memory_key,
+      memory: formatMemorySummary(memory),
+    });
+  }
+);
+
+server.registerTool(
+  "list_memories",
+  {
+    description:
+      "List memories with lightweight summaries and optional admin filters.",
+    inputSchema: {
+      scope: scopeSchema.optional(),
+      project: z.string().optional(),
+      kind: kindSchema.optional(),
+      archived: z.boolean().optional(),
+      limit: z.number().int().min(1).max(100).optional(),
+    },
+  },
+  async (args) => {
+    const memories = store.listMemories(args).map(formatMemorySummary);
+    return toolResult(`Listed ${memories.length} memory record(s)`, {
+      memories,
+      filters: {
+        scope: args.scope ?? null,
+        project: args.project ?? null,
+        kind: args.kind ?? null,
+        archived: args.archived ?? false,
+        limit: args.limit ?? 10,
+      },
+    });
+  }
+);
+
+server.registerTool(
   "get_recent_memories",
   {
     description: "List recent or recently used durable memories.",
@@ -152,6 +210,36 @@ server.registerTool(
   }
 );
 
+server.registerTool(
+  "delete_memory",
+  {
+    description:
+      "Hard-delete one memory by id or memory_key. Requires confirm=true.",
+    inputSchema: {
+      id: z.number().int().optional(),
+      memory_key: z.string().optional(),
+      confirm: z.boolean(),
+    },
+  },
+  async (args) => {
+    const deleted = store.deleteMemory(args);
+
+    if (!deleted) {
+      return toolResult("No memory found to delete", {
+        deleted: false,
+        selector: selectorSummary(args),
+        memory: null,
+      });
+    }
+
+    return toolResult(`Deleted memory ${deleted.id}`, {
+      deleted: true,
+      selector: selectorSummary(args),
+      memory: formatMemorySummary(deleted),
+    });
+  }
+);
+
 process.on("exit", () => {
   store.close();
 });
@@ -174,6 +262,13 @@ function toolResult(message, data) {
   return {
     content: [{ type: "text", text: message }],
     structuredContent: data,
+  };
+}
+
+function selectorSummary(args) {
+  return {
+    id: args.id ?? null,
+    memory_key: args.memory_key ?? null,
   };
 }
 

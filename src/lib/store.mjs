@@ -203,6 +203,53 @@ export class MemoryStore {
     return this.getMemoryById(id, { includeArchived: true });
   }
 
+  deleteMemory(input) {
+    const confirmed = input?.confirm === true;
+    if (!confirmed) {
+      throw new Error("delete_memory requires confirm=true");
+    }
+
+    const hasId = input?.id !== undefined && input?.id !== null;
+    const hasKey = normalizeText(input?.memory_key) !== null;
+
+    if (hasId === hasKey) {
+      throw new Error("Provide exactly one of id or memory_key");
+    }
+
+    let existing;
+    let result;
+
+    if (hasId) {
+      const id = Number(input.id);
+      existing = this.getMemoryById(id, { includeArchived: true });
+      if (!existing) {
+        return null;
+      }
+
+      result = this.db.prepare(`
+        DELETE FROM memories
+        WHERE id = ?
+      `).run(id);
+    } else {
+      const memoryKey = normalizeText(input.memory_key);
+      existing = this.getMemoryByKey(memoryKey, { includeArchived: true });
+      if (!existing) {
+        return null;
+      }
+
+      result = this.db.prepare(`
+        DELETE FROM memories
+        WHERE memory_key = ?
+      `).run(memoryKey);
+    }
+
+    if (result.changes === 0) {
+      return null;
+    }
+
+    return existing;
+  }
+
   getMemoryById(id, options = {}) {
     const includeArchived = Boolean(options.includeArchived);
     const row = this.db.prepare(`
@@ -213,6 +260,68 @@ export class MemoryStore {
     `).get(Number(id));
 
     return row ? rowToMemory(row) : null;
+  }
+
+  getMemoryByKey(memoryKey, options = {}) {
+    const key = normalizeText(memoryKey);
+    if (!key) {
+      throw new Error("memory_key is required");
+    }
+
+    const includeArchived = Boolean(options.includeArchived);
+    const row = this.db.prepare(`
+      SELECT *
+      FROM memories
+      WHERE memory_key = ?
+      ${includeArchived ? "" : "AND is_archived = 0"}
+      ORDER BY id DESC
+      LIMIT 1
+    `).get(key);
+
+    const memory = row ? rowToMemory(row) : null;
+    if (memory) {
+      this.#touchMemories([memory.id]);
+    }
+    return memory;
+  }
+
+  listMemories(filters = {}) {
+    const params = [];
+    const where = [];
+
+    if (filters.scope) {
+      where.push("scope = ?");
+      params.push(normalizeScope(filters.scope));
+    }
+
+    if (filters.project) {
+      where.push("project = ?");
+      params.push(normalizeText(filters.project));
+    }
+
+    if (filters.kind) {
+      where.push("kind = ?");
+      params.push(normalizeKind(filters.kind));
+    }
+
+    if (filters.archived === true) {
+      where.push("is_archived = 1");
+    } else if (filters.archived === false || filters.archived === undefined) {
+      where.push("is_archived = 0");
+    }
+
+    params.push(normalizeLimit(filters.limit));
+
+    const rows = this.db.prepare(`
+      SELECT *
+      FROM memories
+      ${where.length ? `WHERE ${where.join(" AND ")}` : ""}
+      ORDER BY updated_at DESC, id DESC
+      LIMIT ?
+    `).all(...params).map(rowToMemory);
+
+    this.#touchMemories(rows.map((row) => row.id));
+    return rows;
   }
 
   getRecentMemories(filters = {}) {
@@ -403,4 +512,3 @@ export function formatMemorySummary(memory) {
     archived: memory.is_archived,
   };
 }
-

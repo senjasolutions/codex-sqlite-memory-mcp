@@ -26,3 +26,9 @@ jobs:
 
       - name: Run path verification
         run: npm run verify:paths
+
+      - name: Run protocol regression tests
+        run: npm run verify:protocol
+
+      - name: Run storage regression tests
+        run: npm run verify:storage
