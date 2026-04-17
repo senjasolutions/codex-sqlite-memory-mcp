@@ -24,6 +24,7 @@ This project gives Codex a small explicit memory layer for durable facts, decisi
 - a verification script
 - Codex config example
 - AGENTS guidance for good memory hygiene
+- contributor guidance in `CONTRIBUTING.md`
 - an improved implementation handoff document
 
 ## Core tools
@@ -98,6 +99,8 @@ or:
 ```bash
 node tests/verify.mjs
 ```
+
+Contributor notes live in `CONTRIBUTING.md`.
 
 Continuous integration:
 
@@ -177,6 +180,12 @@ Do not store:
 - duplicate noise
 - secrets, passwords, tokens, private keys
 
+Secret detection note:
+
+- the server applies best-effort secret blocking before writing memory
+- this is intentionally conservative but not perfect
+- never intentionally store secrets and never treat regex-based blocking as complete protection
+
 Archive vs delete:
 
 - `archive_memory` is the safer default and hides a record from normal retrieval without removing it from SQLite
@@ -235,6 +244,7 @@ If WAL files exist, back them up with the main DB file.
 - file reads can still be faster than SQLite lookup for tiny local contexts
 - the bigger win is token reduction and repeated-task recall, not sub-millisecond local IO
 - search quality is intentionally simple and should stay permissive rather than overconstrained
+- secret detection is best-effort only; obfuscated or unusual secret formats may still get through, and some security-related prose may still be conservatively blocked in edge cases
 
 ## Protocol behavior
 

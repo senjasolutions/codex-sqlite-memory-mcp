@@ -30,5 +30,8 @@ jobs:
       - name: Run protocol regression tests
         run: npm run verify:protocol
 
+      - name: Run secret regression tests
+        run: npm run verify:secrets
+
       - name: Run storage regression tests
         run: npm run verify:storage

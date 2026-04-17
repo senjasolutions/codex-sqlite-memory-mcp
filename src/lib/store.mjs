@@ -13,7 +13,14 @@ const SECRET_PATTERNS = [
   /-----BEGIN [A-Z ]*PRIVATE KEY-----/i,
   /\b(api[_-]?key|access[_-]?token|refresh[_-]?token|client[_-]?secret|password)\b\s*[:=]/i,
   /\bsk-[a-z0-9]{20,}\b/i,
+  /\bsk-(proj|live|test)-[A-Za-z0-9_-]{16,}\b/i,
   /\bAKIA[0-9A-Z]{16}\b/,
+  /\bASIA[0-9A-Z]{16}\b/,
+  /\bghp_[A-Za-z0-9]{30,}\b/,
+  /\bgithub_pat_[A-Za-z0-9_]{20,}\b/,
+  /\bxox[baprs]-[A-Za-z0-9-]{10,}\b/,
+  /\b(?:sk|rk)_live_[A-Za-z0-9]{16,}\b/,
+  /\bAIza[0-9A-Za-z\-_]{30,}\b/,
   /\bBearer\s+[A-Za-z0-9._-]{20,}\b/i,
 ];
 

@@ -22,6 +22,7 @@ The format is based on Keep a Changelog, with semantic versioning adapted for a 
 - GitHub Actions CI workflow for `verify` and `verify:paths`
 - dedicated troubleshooting guidance in the README
 - documented protocol behavior with opt-in stderr debug logging
+- expanded regex-based secret detection and dedicated secret regression coverage
 
 ### Changed
 
