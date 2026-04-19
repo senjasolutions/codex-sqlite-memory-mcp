@@ -172,6 +172,8 @@ Good records:
 - bug causes and fixes
 - task checkpoints
 - user preferences that affect future engineering work
+- one compact current-state summary per active project
+- sanitized summaries of recurring state that would otherwise get reloaded from docs or chat
 
 Do not store:
 
@@ -246,6 +248,16 @@ If WAL files exist, back them up with the main DB file.
 - search quality is intentionally simple and should stay permissive rather than overconstrained
 - secret detection is best-effort only; obfuscated or unusual secret formats may still get through, and some security-related prose may still be conservatively blocked in edge cases
 
+## Curation pattern
+
+When turning recent work into durable memory:
+
+1. Prefer a short `Current state:` summary for each active project or workstream.
+2. Keep the summary abstracted and sanitized, enough to preserve retrieval value without copying raw chat.
+3. Include the phrases you are likely to search later in `content` or `tags`.
+4. Archive low-signal seed rows and obvious test entries once the corpus has a better durable replacement.
+5. Use `graphify-out` for broad discovery, then distill the useful result into memory.
+
 ## Protocol behavior
 
 - supported tools are exposed through normal MCP `tools/list`
@@ -253,7 +265,7 @@ If WAL files exist, back them up with the main DB file.
 - notifications that the server does not explicitly use are ignored safely
 - debug logging is opt-in only and goes to stderr, never stdout
 
-Enable debug logging:
+enable debug logging:
 
 ```bash
 MEMORY_DEBUG=1 node src/main.mjs
