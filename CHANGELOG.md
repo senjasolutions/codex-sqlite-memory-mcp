@@ -9,7 +9,8 @@ The format is based on Keep a Changelog, with semantic versioning adapted for a 
 
 ## [Unreleased]
 
-- No unreleased changes yet.
+- Clarified memory curation guidance to prefer compact current-state summaries for active projects, sanitize durable records, and archive low-signal seed/test rows once a better summary exists.
+- Expanded README and handoff guidance with a retrieval-first curation pattern that uses graph discovery for source gathering and memory for distilled reuse.
 
 ## [0.2.0] - 2026-04-17
 
