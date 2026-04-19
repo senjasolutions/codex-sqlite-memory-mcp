@@ -141,6 +141,8 @@ Store:
 - setup notes
 - task checkpoints
 - durable user preferences
+- compact current-state summaries for active projects
+- sanitized summaries that replace repeated doc/chat reloads
 
 Do not store:
 
@@ -149,6 +151,13 @@ Do not store:
 - noise
 - duplicates
 - secrets
+
+Recommended pattern:
+
+- write one concise `Current state:` summary per active project or workstream
+- include likely search terms in `content` or `tags`
+- archive seed/test rows once a stronger durable record exists
+- use `graphify-out` to discover the source material first, then distill it into memory
 
 ## Secret handling
 
